@@ -1,0 +1,132 @@
+RC LAP TIMER - KÄYTTÖOHJE
+---------------------------------------------------------------------
+1. LAITTEISTON KOKOONPANO
+---------------------------------------------------------------------
+
+* Kytke 1–4 LDR-anturia RCA-liittimiin.
+* Suuntaa jokaiseen anturiputkeen valonlähde, esimerkiksi tehokas taskulamppu tai laserosoitin.
+
+Ennen ajoa tarkista ja tarvittaessa säädä anturien vertailutaso.
+
+* Vaihe 1
+  Kytke laite USB-virtaan.
+
+* Vaihe 2
+  Kun näyttö näyttää "-HELLO-", paina ja pidä painettuna joko UP- tai DOWN-painiketta (kaksi vierekkäistä vasenta painiketta).
+
+* Vaihe 3
+  Hetken kuluttua anturien säätönäyttö alkaa kiertää anturijännitteitä.
+
+  Näyttöjärjestys:
+  * UE
+  * U1
+  * U2
+  * U3
+  * U4
+  * Ohjelmiston versionumero
+  (toistuu tämän jälkeen)
+
+  Jännitteiden merkitykset:
+  * UE  = vertailujännite (säädettävissä RCA-liittimien vieressä olevalla potentiometrillä)
+  * U1–U4 = kunkin anturin jännite
+
+  Huomiot:
+  * Jos anturi näyttää 0 tai 3,3 V, se on väärin kytketty tai saa liian vähän/liikaa valoa.
+  * Lukemat 0,2–2,9 V ovat käyttökelpoisia.
+
+  Säätöohje:
+  * Aseta auto valonlähteen ja anturin väliin.
+  * Säädä potentiometriä niin, että UE on hieman pienempi kuin auton aiheuttama arvo mutta suurempi kuin pelkän valon arvo.
+  * Säädä rauhallisesti ja odota seuraavaan näyttöp päivitykseen ennen uutta muutosta.
+
+* Vaihe 4
+  Kun säätö on valmis, paina START (keskimmäinen painike) poistuaksesi säätötilasta.
+
+---------------------------------------------------------------------
+2. KILPAILUN AJAMINEN
+---------------------------------------------------------------------
+
+* Paina START.
+
+* Näyttö ilmoittaa ajettavien kierrosten määrän.
+  Esimerkki:
+  LAP5 4
+
+* Lyhyen viiveen jälkeen näytöllä näkyvät käytössä olevat radat.
+  Esimerkki:
+  LAHE 1 3
+  Tämä kertoo, että radat 1 ja 3 ovat aktiivisia.
+
+LÄHTÖVALOT
+
+* Näytölle ilmestyy yksi "8".
+* Joka sekunti syttyy uusi 8, kunnes viisi kappaletta on näkyvissä.
+* Satunnaisen 0,2–3 s viiveen jälkeen näyttö tyhjenee ja kilpailu alkaa.
+* Kahden sekunnin kuluttua kilpailukello ilmestyy.
+
+KIERROSTEN TUNNISTUS
+
+* Kun auto katkaisee anturin, näyttö kertoo radan numeron, kierroksen ja kuluneen ajan.
+
+  Esimerkit:
+  1.2 00.12.2   = rata 1, kierros 2, aika 12,2 s
+  3.7 32.12.3   = rata 3, kierros 7, aika 32 min 12,3 s
+
+  Muoto:
+  <rata>.<kierros> MM:SS.t
+
+MAALI
+
+* Kun tavoitekierrokset täyttyvät, kierrosnumero korvautuu kirjaimella "F".
+
+  Esimerkki:
+  2.F 13.02.6   = rata 2 valmiina aikaan 13 min 2,6 s
+
+KILPAILUN TULOKSET
+
+* Kun kaikki aktiiviset radat ovat maalissa, kilpailutila päättyy.
+* Tulokset näytetään järjestyksessä 1.–4. sijaan saakka.
+* Näytön muoto on sijoitus, radan numero ja kokonaisaika.
+
+  Esimerkki:
+  1.4 41.23.2
+  2.1 44.23.2
+
+  Tässä rata 4 voitti ajalla 41 min 23,2 s ja rata 1 tuli toiseksi minuutin myöhemmin.
+
+UUSI LÄHTÖ
+
+* Uuden kilpailun voi käynnistää milloin tahansa lähtövalojen jälkeen, joko kellon käydessä tai tulosnäkymässä.
+
+KIERROSMÄÄRÄN MUUTTAMINEN
+
+* Paina START, jolloin näet kierrosmäärän (esim. LAP5 4).
+* Kun kierrosmäärä näkyy, muuta arvoa UP/DOWN-painikkeilla.
+* Paina START tallentaaksesi lukeman.
+* Paina START uudelleen aloittaaksesi lähdön.
+
+---------------------------------------------------------------------
+3. VIANETSINTÄ
+---------------------------------------------------------------------
+
+ONGELMA: Ratoja ei aktivoida
+
+* Tarkista anturijännitteet diagnostiikkatilassa.
+* Jos jännite pysyy alle
+  SILENT_LANES_BELOW_MV_ON_RACE_START (0,1 V)
+  tai yli
+  SILENT_LANES_ABOVE_MV_ON_RACE_START (3 V),
+  ohjelmisto tulkitsee anturin irrotetuksi.
+
+ONGELMA: Näyttö sekoaa pitkien kisojen jälkeen
+
+* Pidä kierrosmäärä välillä 1–99.
+* Rajoita kokonaisaika alle 100 minuuttiin.
+* Suuremmat arvot ylittävät näytön kapasiteetin.
+
+Se siitä – nyt olet valmis ajamaan RC Lap Timerilla!
+
+---------------------------------------------------------------------
+4. LÄHDEKOODI
+---------------------------------------------------------------------
+https://github.com/linnukka/rclaptimer
