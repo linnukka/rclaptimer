@@ -1,0 +1,69 @@
+RC Lap Timer – User Guide
+==========================
+
+1. Hardware Setup
+-----------------
+- Connect the MAX72xx 8-digit LED module to the ESP32 pins defined in `rclaptimer_conf.h` (DATA, CLK, CS).
+- Wire the START, UP, and DOWN push buttons to their respective GPIOs with pull-up configuration. Ensure buttons pull the line low when pressed.
+- Attach up to four stop sensors (photogates, IR receivers, etc.) to GPIO34/35/36/39. Provide the proper reference voltage wiring so that triggered lanes drop below the reference threshold.
+- Optionally connect an external reference-level source to GPIO32 and set the jumper (`USE_EXT_REF_JUMPER_PIN`) to enable external reference mode.
+- Power the ESP32 with a stable 5V/USB source capable of supplying the display and sensors.
+
+2. Firmware Installation
+------------------------
+1. Install VS Code + PlatformIO.
+2. Clone or open the `rclaptimer` workspace.
+3. Update Wi-Fi SSID/password and MQTT settings in `src/rclaptimer_credentials*.h` and `src/rclaptimer_mqttdefs.h`.
+4. Connect the ESP32 via USB and run `platformio run --target upload --upload-port <PORT>`.
+5. Open a serial monitor at 115200 baud to verify the "RC Lap timer starting up" message and build identifier.
+
+3. Initial Configuration
+------------------------
+- Power on the device while holding either the UP or DOWN button to enter voltage display/diagnostic mode. The display cycles through:
+  1. `UE` + external reference voltage.
+  2. `U1`–`U4` + each lane’s sensor voltage.
+  3. Build identifier (`BUILD_MMDDHHMM`).
+  Release the buttons to exit diagnostics.
+- From the idle screen (`LAP5 nn`), use the UP/DOWN buttons to adjust the target lap count (1–99). Each adjustment requires the button to be released between presses. The value is saved to non-volatile storage when the start button kicks off the race sequence.
+
+4. Running a Race
+-----------------
+1. Ensure all lane sensors read safe voltages (above the unplugged threshold defined in `SILENT_LANES_BELOW_MV_ON_RACE_START`).
+2. Press and hold the START button until the start-lights animation begins. The six red lights illuminate sequentially, then extinguish after a randomized delay.
+3. When the display switches to the race clock, the race is live. Lap times begin when each lane’s stop sensor transitions below the reference threshold twice in succession.
+4. The LED display shows the race clock (MM:SS.t). Each time a lane registers a lap, the device briefly shows the lane indicator and lap count per the configured rules.
+5. Once a lane reaches the target lap count, it is marked with an `F` and its finish time is stored. When all enabled lanes finish, the system halts the clock and transitions to the race-results view automatically.
+
+5. Viewing Results
+------------------
+- After the race, the display cycles through each enabled lane’s finish time ordered from fastest to slowest. Format: `<rank>.<lane#> MM:SS.t` (rank includes a decimal point). The loop repeats indefinitely until the next race reset.
+- To reset, press START again; this clears timers, lap counts, and re-enables lap configuration.
+
+6. Wi-Fi and MQTT
+-----------------
+- The device attempts to connect to the configured Wi-Fi network at boot. Status messages print to serial (e.g., “[WiFi] Waiting for connection”).
+- Once online, it connects to the MQTT broker defined in `rclaptimer_mqttdefs.h` and starts publishing race telemetry according to the firmware logic (extend as needed).
+- If the connection drops, the `tWifiReconnect` task periodically retries; no manual intervention is required unless credentials are incorrect.
+
+7. Maintenance & Tips
+---------------------
+- Use OTA (ArduinoOTA) for wireless firmware updates if the network allows mDNS traffic.
+- Periodically inspect sensor wiring and ensure the reference voltage is stable; noisy readings can be identified via the diagnostic voltage cycle.
+- To change the default lap count or thresholds, edit `rclaptimer_conf.h`, rebuild, and flash.
+- Keep the ESP32 in a ventilated enclosure if the LED display and sensors draw significant current to prevent thermal drift affecting ADC readings.
+
+8. Troubleshooting
+------------------
+Issue: Lap count does not persist after power cycle.
+- Ensure the UP/DOWN adjustments occur while the device is in the idle (configurable) state; the value writes to Preferences when the race is reset/started.
+
+Issue: Lanes never enable.
+- Check stop input voltages via diagnostic mode. If they remain below `SILENT_LANES_BELOW_MV_ON_RACE_START`, the firmware considers the lane unplugged.
+
+Issue: Display gibberish after long races.
+- Confirm lap counts stay within 1–99 and race duration stays under 100 minutes; out-of-range values exceed display capacity.
+
+Issue: MQTT not receiving data.
+- Verify broker address/credentials and ensure the network firewall allows outbound connections from the ESP32 to port 1883.
+
+That’s it! You’re ready to operate the RC Lap Timer and fine-tune it for your racing events.

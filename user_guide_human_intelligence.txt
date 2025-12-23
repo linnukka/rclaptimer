@@ -1,0 +1,148 @@
+RC LAP TIMER - USER GUIDE
+---------------------------------------------------------------------
+1. HARDWARE SETUP
+---------------------------------------------------------------------
+
+* Plug 1-4 LDR sensors into the RCA connectors.
+* Point a light source at each sensor tube using either a strong
+  flashlight or a laser pointer.
+
+Before racing, check and adjust the sensor reference if needed.
+
+* Step 1
+  Plug in the USB power.
+
+* Step 2
+  When the display shows "-HELLO-", press and hold either the UP or
+  DOWN button (the two left-side buttons next to each other).
+
+* Step 3
+  After a short while, the sensor adjustment display begins cycling
+  through sensor voltages.
+
+  Display sequence:
+  * UE
+  * U1
+  * U2
+  * U3
+  * U4
+  * Firmware build number
+  (then repeats)
+
+  Voltage meanings:
+  * UE  = reference voltage (adjustable via the potentiometer next to
+          the RCA connectors)
+  * U1- U4 = individual sensor voltages
+
+  Voltage notes:
+  * If a sensor reads 0 or 3.3, it is either not connected correctly
+    or is receiving too little or too much light.
+  * Readings between 0.2 and 2.9 are acceptable.
+
+  Adjustment procedure:
+  * Place the car between the light source and the sensor.
+  * Adjust the potentiometer so UE reads slightly lower than the
+    car-detected value, but higher than the value when the sensor
+    sees only the light source.
+  * Adjust gently and wait for the next display update cycle before
+    making further changes.
+
+* Step 4
+  When finished, press the START button (middle button) once to exit
+  sensor adjustment mode.
+
+
+---------------------------------------------------------------------
+2. RUNNING A RACE
+---------------------------------------------------------------------
+
+* Press the START button.
+
+* The display shows the number of laps to run.
+  Example:
+  LAP5 4
+
+* After a short delay, the enabled lanes are displayed.
+  Example:
+  LAHE 1 3
+  This means lane sensors 1 and 3 are active.
+
+START LIGHT SEQUENCE
+
+* The display shows a single "8".
+* Each second, another "8" is added until five "8"s are displayed.
+* After a random delay between 0.2 and 3 seconds, the display turns
+  off, signaling the race start.
+* Two seconds later, the race timer appears on the display.
+
+LAP DETECTION
+
+* Each time a car passes a sensor, the display shows lane number,
+  lap number, and elapsed time.
+
+  Examples:
+  1.2 00.12.2   = lane 1, lap 2, time 12.2 seconds
+  3.7 32.12.3   = lane 3, lap 7, time 32 minutes 12.3 seconds
+
+  Format:
+  <lane#>.<lap#> MM:SS.t
+
+FINISH
+
+* When the target lap count is reached, the lap number is replaced
+  with "F".
+
+  Example:
+  2.F 13.02.6   = lane 2 finished in 13 minutes 2.6 seconds
+
+RACE RESULTS
+
+* When all active lanes have finished, race mode ends.
+* Results are displayed in order: 1st, 2nd, 3rd, and 4th (if used).
+* The display shows finishing position, lane number, and total time.
+
+  Example:
+  1.4 41.23.2
+  2.1 44.23.2
+
+  This means lane 4 won with a time of 41 minutes 23.2 seconds, and
+  lane 1 finished second one minute later.
+
+  Format:
+  <rank>.<lane#> MM:SS.t
+
+STARTING A NEW RACE
+
+* A new race can be started any time after the start light sequence
+  finishes, either while the race clock is running or while results
+  are displayed.
+
+CHANGING THE LAP COUNT
+
+* Press START to display the lap count (e.g. LAP5 4).
+* While the lap count is shown, use the UP/DOWN buttons to change it.
+* Press START to save the new value.
+* Press START again to begin the race sequence.
+
+---------------------------------------------------------------------
+3. TROUBLESHOOTING
+---------------------------------------------------------------------
+
+ISSUE: Lanes never enable
+
+* Check stop input voltages using diagnostic mode.
+* If voltages remain below
+  SILENT_LANES_BELOW_MV_ON_RACE_START (0.1 V)
+  or above
+  SILENT_LANES_ABOVE_MV_ON_RACE_START (3 V),
+  the firmware considers the lane unplugged.
+
+ISSUE: Display shows gibberish after long races
+
+* Ensure lap counts remain between 1 and 99.
+* Ensure total race duration stays under 100 minutes.
+* Values outside these limits exceed the display capacity.
+
+
+That’s it.
+You’re ready to have fun with the RC Lap Timer.

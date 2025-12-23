@@ -1,0 +1,61 @@
+RC Lap Timer Firmware Documentation
+==================================
+
+Overview
+--------
+The RC Lap Timer firmware targets an ESP32-based controller that manages a four-lane RC race setup. It coordinates race lights, lap sensing via analog stop inputs, lap timing, Wi-Fi/MQTT telemetry, and an LED segment display for on-device feedback. The system persists user-configured lap targets in NVS, can display live voltages for diagnostics, and publishes race updates over the network.
+
+Key Features
+------------
+1. Four-lane analog stop sensor interface with programmable reference level and per-lane debouncing/trigger intervals.
+2. Start-light sequence with random delay generation and a race clock display rendered on an 8-digit MAX72xx LED matrix.
+3. Configurable target lap count (1–99 laps) adjustable with UP/DOWN buttons while the race is idle, persisted to Preferences storage.
+4. Voltage diagnostic mode showing external reference voltage and each lane sensor voltage, plus build identifier display.
+5. Race completion summary loop that cycles through lane results ordered by elapsed time.
+6. Wi-Fi + MQTT connectivity with OTA support and watchdog-like tasks for reconnection.
+
+Hardware Interfaces
+-------------------
+- LED Display: MAX72xx-driven 8-digit module connected via GPIO-defined data/clock/CS lines.
+- Buttons: START, UP, DOWN (and jumper for external reference enable) using GPIO with pull-ups.
+- Stop Sensors: Four ADC-capable inputs (GPIO34/35/36/39) sampled at 12-bit resolution with 11 dB attenuation.
+- Reference Level: Dedicated ADC pin (GPIO32) for external reference measurement.
+- Wi-Fi/MQTT: Standard ESP32 radios with credentials defined in rclaptimer_credentials.* headers.
+
+Firmware Architecture
+---------------------
+- Scheduler: Uses TaskScheduler to run periodic callbacks for Wi-Fi maintenance, OTA, MQTT loop, start-light timing, race clock updates, stop-input polling, button polling, race completion display, voltage diagnostics, and configuration delays.
+- State Tracking: Global arrays hold per-lane enablement, lap counts, stop-input hysteresis, elapsed times, and last-trigger timestamps.
+- Race Flow: The START button arms the start-light task, which animates six red lights before launching the race after a randomized delay. Once the race begins, the race clock task updates the display continuously until stopped.
+- Lap Detection: `pollStopInputsCallback` samples each active lane, compares to the current reference threshold, applies consecutive-low filtering, enforces a configurable cooldown (`STOP_INPUT_TRIGGER_INTERVAL_MS`), increments lap counters, and captures lap times once the lane reaches `targetLapCount` laps.
+- Race Completion: When every enabled lane finishes, stop polling and schedule `raceCompletedCallback`, which sorts lanes by final time and cycles through `<rank>.<lane> MM:SS.t` readouts indefinitely.
+- Diagnostics: `showVoltagesCallback` cycles through external reference voltage, each lane’s live voltage, and the compiled build identifier (BUILD_MMDDHHMM macro).
+
+Configuration/Extensibility
+---------------------------
+- Timing constants, pin assignments, and thresholds live in `rclaptimer_conf.h` and `rclaptimer_timedefs.h`.
+- Credentials and MQTT topics live in `rclaptimer_credentials.h` and `rclaptimer_mqttdefs.h`.
+- Default lap count defined as `DEFAULT_LAP_COUNT` and persisted via Preferences.
+- Build ID macros defined in `build_number.h`; `BUILD_MMDDHHMM` is displayed during diagnostics, while `BUILD_NUMBER` logs the full string.
+
+Build & Deployment
+------------------
+1. Install PlatformIO and open the project workspace.
+2. Update Wi-Fi/MQTT credentials in the corresponding headers.
+3. Optionally adjust pin mappings and thresholds in `rclaptimer_conf.h`.
+4. Run `platformio run --target upload --upload-port <PORT>` to flash the ESP32.
+5. Monitor serial output at 115200 baud during bring-up; the firmware reports the build ID and system status.
+6. OTA updates and MQTT require network connectivity; ensure your Wi-Fi network allows the device to connect to the configured broker.
+
+Testing Considerations
+----------------------
+- Validate stop sensor thresholds by enabling voltage display mode (hold UP or DOWN during boot) and observing measured millivolt values.
+- Confirm lap detection by simulating stop-input pulses below the reference threshold; watch serial logs for lap increments and F-finish markers.
+- Verify persistence by adjusting the lap count, power cycling, and checking that the target value reappears on reset (`LAP5 nn` idle display).
+- Use the race-completion display loop to ensure finishing order matches expectations.
+
+Troubleshooting
+---------------
+- If the display shows unexpected characters after long races, ensure lap counts and clock digits remain within supported ranges (<100 minutes, <100 laps).
+- Wi-Fi reconnection failures will appear in the serial log; confirm credentials and signal strength.
+- Lap detection noise can be mitigated by tuning `STOP_INPUT_TRIGGER_INTERVAL_MS`, `SILENT_LANES_BELOW_MV_ON_RACE_START`, and the reference-level source.
